@@ -1,12 +1,19 @@
 const app = require("./app");
 const config = require("./app/config");
+const MongoDB = require("./app/utils/mongodb.util");
 
-// Start the server
-const PORT = config.app.port || 3000; // Use port from config or default to 3000
-app.listen(PORT, (err) => {
-  if (err) {
-    console.error("Error starting server:", err);
-  } else {
-    console.log(`Server is running on port ${PORT}.`);
+async function startServer() {
+  try {
+    await MongoDB.connect(config.db.uri);
+    console.log("Connected to the database!");
+    const PORT = config.app.port;
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  } catch (error) {
+    console.log("Cannot connect to the database!", error);
+    process.exit();
   }
-});
+}
+
+startServer();
